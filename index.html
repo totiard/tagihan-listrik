@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENGHITUNG BIAYA TAGIHAN LISTRIK</title>
+    <link rel="icon" type="image/png" href="assets/logo small.png">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <h2 align="center" class="logo-container"><img src="assets/logo pln.png" alt="Logo PLN" class="logo">
+            Menghitung Biaya <br> Tagihan Listrik <br> by Toti</h2>
+
+        <form id="formHitung">
+            <div class="form-group">
+                <label for="namaPelanggan">Nama Pelanggan:</label>
+                <input type="text" id="namaPelanggan" name="namaPelanggan" maxlength="50" required>
+            </div>
+            <div class="form-group">
+                <label for="jenis_kelamin">Kategori:</label>
+                <select id="kategori" name="kategori" required>
+                    <option value="">Pilih Kategori</option>
+                    <option value="sosial">Sosial (2200 VA)</option>
+                    <option value="rumahTangga">Rumah Tangga (1300 VA)</option>
+                    <option value="industri">Industri (6600 VA)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="periode">Periode:</label>
+                <div class="periode-input">
+                    <input type="date" id="periodeAwal" name="periodeAwal" required>
+                    <pre> sd </pre>
+                    <input type="date" id="periodeAkhir" name="periodeAkhir" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="jumlahPemakaian">Jumlah Pemakaian Listrik (kWh):</label>
+                <input type="number" id="jumlahPemakaian" name="jumlahPemakaian" min="1" required>
+            </div>
+            <button type="submit">Submit</button>
+            <button type="reset">Cancel</button>
+        </form>
+
+
+        <div id="rincianTagihan" class="container_table" align="center">
+            <h2>Rincian Tagihan</h2>
+            <table border="">
+                <tr>
+                    <th>Nama Pelanggan</th>
+                    <td id="namaPelangganCell"></td>
+                </tr>
+                <tr>
+                    <th>Kategori</th>
+                    <td id="kategoriCell"></td>
+                </tr>
+                <tr>
+                    <th>Jumlah Pemakaian</th>
+                    <td id="jumlahPemakaianCell"></td>
+                </tr>
+                <tr>
+                    <th>Periode</th>
+                    <td id="periodeCell"></td>
+                </tr>
+                <tr>
+                    <th>Abodemen</th>
+                    <td id="abodemenCell"></td>
+                </tr>
+                <tr>
+                    <th>Tarif Per kWh</th>
+                    <td id="tarifPerKwhCell"></td>
+                </tr>
+                <tr>
+                    <th>Pajak</th>
+                    <td id="pajakCell"></td>
+                </tr>
+                <tr>
+                    <th>Sub Total</th>
+                    <td id="subTotalCell"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+<script src="script.js"></script>
+</body>
+
+</html>
