@@ -1,92 +1,130 @@
-const form = document.getElementById('formHitung');
-const namaPelangganInput = document.getElementById('namaPelanggan');
-const kategoriSelect = document.getElementById('kategori');
-const periodeAwalInput = document.getElementById('periodeAwal');
-const periodeAkhirInput = document.getElementById('periodeAkhir');
-const jumlahPemakaianInput = document.getElementById('jumlahPemakaian');
-const namaPelangganCell = document.getElementById('namaPelangganCell');
-const kategoriCell = document.getElementById('kategoriCell');
-const jumlahPemakaianCell = document.getElementById('jumlahPemakaianCell');
-const periodeCell = document.getElementById('periodeCell');
-const abodemenCell = document.getElementById('abodemenCell');
-const tarifPerKwhCell = document.getElementById('tarifPerKwhCell');
-const pajakCell = document.getElementById('pajakCell');
-const subTotalCell = document.getElementById('subTotalCell');
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggleButton = document.getElementById("theme-toggle");
+  const themeToggleDarkIcon = document.getElementById("theme-toggle-dark-icon");
+  const themeToggleLightIcon = document.getElementById(
+    "theme-toggle-light-icon"
+  );
 
-form.addEventListener('submit', (event) => {
+  // Fungsi untuk menampilkan ikon yang benar saat halaman dimuat
+  const setInitialIcons = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      themeToggleLightIcon.classList.remove("hidden");
+      themeToggleDarkIcon.classList.add("hidden");
+    } else {
+      themeToggleDarkIcon.classList.remove("hidden");
+      themeToggleLightIcon.classList.add("hidden");
+    }
+  };
+
+  setInitialIcons();
+
+  themeToggleButton.addEventListener("click", () => {
+    // Toggle kelas 'dark' pada elemen <html>
+    document.documentElement.classList.toggle("dark");
+
+    // Perbarui preferensi di localStorage
+    if (document.documentElement.classList.contains("dark")) {
+      localStorage.setItem("color-theme", "dark");
+    } else {
+      localStorage.setItem("color-theme", "light");
+    }
+
+    // Perbarui ikon
+    setInitialIcons();
+  });
+
+  // --- LOGIKA KALKULATOR (TIDAK BERUBAH) ---
+  const form = document.getElementById("formHitung");
+  const resetButton = document.getElementById("resetButton");
+  const rincianTagihan = document.getElementById("rincianTagihan");
+
+  function formatRupiah(number) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(number);
+  }
+
+  function formatDate(dateString) {
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return new Date(dateString).toLocaleDateString("id-ID", options);
+  }
+
+  function formatKategori(key) {
+    if (key === "rumahTangga") return "Rumah Tangga";
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  }
+
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    // Get input values
-    const namaPelanggan = namaPelangganInput.value;
-    const kategori = kategoriSelect.value;
-    const periodeAwal = periodeAwalInput.value;
-    const periodeAkhir = periodeAkhirInput.value;
-    const jumlahPemakaian = parseInt(jumlahPemakaianInput.value);
-
-    const kategoriCapitalized = kategori.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-
-    // Calculate bill details
-    const tarifPerKwh = {
-        sosial: 1461,
-        rumahTangga: 1461,
-        industri: 1671,
+    const formData = new FormData(form);
+    const data = {
+      namaPelanggan: formData.get("namaPelanggan"),
+      kategori: formData.get("kategori"),
+      periodeAwal: formData.get("periodeAwal"),
+      periodeAkhir: formData.get("periodeAkhir"),
+      jumlahPemakaian: parseInt(formData.get("jumlahPemakaian")),
     };
 
-    const pajak = {
-        sosial: 0,
-        rumahTangga: 10,
-        industri: 30,
-    };
+    const periodeAwalInput = document.getElementById("periodeAwal");
+    const periodeAkhirInput = document.getElementById("periodeAkhir");
+    const dateError = document.getElementById("date-error");
 
-    const abodemen = {
-        sosial: 2200,
-        rumahTangga: 1300,
-        industri: 6600,
-    };
+    dateError.classList.add("hidden");
+    periodeAwalInput.classList.remove("invalid-input");
+    periodeAkhirInput.classList.remove("invalid-input");
 
-    const periode = `${periodeAwal} - ${periodeAkhir}`;
-
-    const totalPemakaianKwh = jumlahPemakaian;
-    const biayaTarif = totalPemakaianKwh * tarifPerKwh[kategori];
-    const pajakPersen = pajak[kategori] / 100;
-    const biayaPajak = biayaTarif * pajakPersen;
-    const subTotal = biayaTarif + biayaPajak + abodemen[kategori];
-
-    // Display bill details
-    namaPelangganCell.textContent = namaPelanggan;
-    kategoriCell.textContent = kategori;
-    jumlahPemakaianCell.textContent = totalPemakaianKwh;
-    periodeCell.textContent = periode;
-    abodemenCell.textContent = abodemen[kategori];
-    tarifPerKwhCell.textContent = 'Rp ' + tarifPerKwh[kategori];
-    pajakCell.textContent = `${pajakPersen * 100}%`;
-    subTotalCell.textContent = subTotal;
-
-    namaPelangganCell.textContent = namaPelanggan;
-    kategoriCell.textContent = kategoriCapitalized;
-
-    // Format and display the period
-    const formattedPeriode = `${formatDate(periodeAwal)} sd ${formatDate(periodeAkhir)}`;
-    periodeCell.textContent = formattedPeriode;
-    jumlahPemakaianCell.textContent = `${totalPemakaianKwh} kWh`;
-
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // Months are zero-based
-        const day = date.getDate();
-
-        const formattedMonth = month < 10 ? `0${month}` : month;
-        const formattedDay = day < 10 ? `0${day}` : day;
-
-        return `${year}/${formattedMonth}/${formattedDay}`;
+    if (new Date(data.periodeAkhir) < new Date(data.periodeAwal)) {
+      dateError.classList.remove("hidden");
+      periodeAwalInput.classList.add("invalid-input");
+      periodeAkhirInput.classList.add("invalid-input");
+      return;
     }
 
-    // Format and display tarif per kwh and sub total with rupiah format
-    subTotalCell.textContent = formatRupiah(subTotal);
+    const tarifData = {
+      sosial: { tarif: 1461, pajak: 0, abodemen: 2200 },
+      rumahTangga: { tarif: 1461, pajak: 10, abodemen: 1300 },
+      industri: { tarif: 1671, pajak: 30, abodemen: 6600 },
+    };
 
-    function formatRupiah(number) {
-        return `${number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}`;
-    }
+    const kategoriInfo = tarifData[data.kategori];
+    const biayaTarif = data.jumlahPemakaian * kategoriInfo.tarif;
+    const biayaPajak = biayaTarif * (kategoriInfo.pajak / 100);
+    const subTotal = biayaTarif + biayaPajak + kategoriInfo.abodemen;
+
+    document.getElementById("namaPelangganCell").textContent =
+      data.namaPelanggan;
+    document.getElementById("kategoriCell").textContent = formatKategori(
+      data.kategori
+    );
+    document.getElementById("periodeCell").textContent = `${formatDate(
+      data.periodeAwal
+    )} - ${formatDate(data.periodeAkhir)}`;
+    document.getElementById(
+      "jumlahPemakaianCell"
+    ).textContent = `${data.jumlahPemakaian} kWh`;
+    document.getElementById("tarifPerKwhCell").textContent = formatRupiah(
+      kategoriInfo.tarif
+    );
+    document.getElementById("abodemenCell").textContent = formatRupiah(
+      kategoriInfo.abodemen
+    );
+    document.getElementById("pajakCell").textContent = `${
+      kategoriInfo.pajak
+    }% (${formatRupiah(biayaPajak)})`;
+    document.getElementById("subTotalCell").textContent =
+      formatRupiah(subTotal);
+
+    rincianTagihan.classList.remove("hidden");
+    rincianTagihan.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  resetButton.addEventListener("click", () => {
+    rincianTagihan.classList.add("hidden");
+    document.getElementById("date-error").classList.add("hidden");
+    document.getElementById("periodeAwal").classList.remove("invalid-input");
+    document.getElementById("periodeAkhir").classList.remove("invalid-input");
+  });
 });
