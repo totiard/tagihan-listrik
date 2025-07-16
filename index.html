@@ -1,63 +1,108 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Modern Tagihan Listrik</title>
     
+    <!-- REVISI: Skrip untuk menerapkan tema sebelum render untuk menghindari kedipan (FOUC) -->
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' ||
+            (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
     <!-- Menggunakan Tailwind CSS untuk styling modern -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- REVISI: Konfigurasi Tailwind CSS dipindahkan setelah CDN dimuat -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        }
+      }
+    </script>
     
-    <!-- Menggunakan font Inter dari Google Fonts untuk tampilan yang lebih bersih -->
+    <!-- Menggunakan font Inter dari Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Menggunakan Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         /* Menjadikan font Inter sebagai font default */
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Transisi halus untuk perubahan warna */
+        body, .bg-white, .bg-slate-200, .bg-slate-800 {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Style tambahan untuk input yang tidak valid */
+        .invalid-input {
+            border-color: #ef4444 !important; /* red-500 */
+            --tw-ring-color: #ef4444 !important; /* red-500 */
+        }
     </style>
 </head>
 
-<body class="bg-slate-100 text-slate-800">
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
 
     <div class="container mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
 
         <!-- Header Aplikasi -->
-        <header class="text-center mb-10">
+        <header class="relative text-center mb-10">
             <div class="flex justify-center items-center gap-4">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Logo_PLN.svg/1200px-Logo_PLN.svg.png" 
                      alt="Logo PLN" 
                      class="w-14 h-auto"
                      onerror="this.onerror=null;this.src='https://placehold.co/60x80/facc15/333?text=PLN';">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Kalkulator Tagihan Listrik</h1>
-                    <p class="text-sm text-slate-500">Hitung estimasi tagihan listrik Anda dengan mudah.</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Kalkulator Tagihan Listrik</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Hitung estimasi tagihan listrik Anda dengan mudah.</p>
                 </div>
             </div>
+            <!-- Tombol Toggle Tema -->
+            <button id="theme-toggle" type="button" class="absolute top-0 right-0 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-200 dark:focus:ring-slate-700 rounded-lg text-sm p-2.5">
+                <i id="theme-toggle-dark-icon" class="fa-solid fa-moon w-5 h-5 hidden"></i>
+                <i id="theme-toggle-light-icon" class="fa-solid fa-sun w-5 h-5 hidden"></i>
+            </button>
         </header>
 
         <!-- Konten Utama: Form dan Hasil -->
         <main class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
             <!-- Kolom Formulir Input -->
-            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
-                <h2 class="text-xl font-bold mb-6">Masukkan Data Pelanggan</h2>
+            <div class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-lg">
+                <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Masukkan Data Pelanggan</h2>
                 <form id="formHitung">
                     <div class="space-y-5">
                         <!-- Input Nama Pelanggan -->
                         <div>
-                            <label for="namaPelanggan" class="block text-sm font-medium text-slate-700 mb-1">Nama Pelanggan</label>
-                            <input type="text" id="namaPelanggan" name="namaPelanggan" maxlength="50" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="namaPelanggan" class="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                <i class="fa-solid fa-user w-4 mr-2 text-slate-400"></i> Nama Pelanggan
+                            </label>
+                            <input type="text" id="namaPelanggan" name="namaPelanggan" placeholder="Masukkan nama Anda" maxlength="50" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         </div>
 
                         <!-- Input Kategori Pelanggan -->
                         <div>
-                            <label for="kategori" class="block text-sm font-medium text-slate-700 mb-1">Kategori</label>
-                            <select id="kategori" name="kategori" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white">
+                            <label for="kategori" class="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                <i class="fa-solid fa-tags w-4 mr-2 text-slate-400"></i> Kategori
+                            </label>
+                            <select id="kategori" name="kategori" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-slate-700 dark:text-slate-200">
                                 <option value="">Pilih Kategori...</option>
                                 <option value="sosial">Sosial (2200 VA)</option>
                                 <option value="rumahTangga">Rumah Tangga (1300 VA)</option>
@@ -67,18 +112,26 @@
 
                         <!-- Input Periode -->
                         <div>
-                            <label for="periodeAwal" class="block text-sm font-medium text-slate-700 mb-1">Periode Tagihan</label>
+                            <label for="periodeAwal" class="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                <i class="fa-solid fa-calendar-days w-4 mr-2 text-slate-400"></i> Periode Tagihan
+                            </label>
                             <div class="flex items-center space-x-2">
-                                <input type="date" id="periodeAwal" name="periodeAwal" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <span class="text-slate-500">s/d</span>
-                                <input type="date" id="periodeAkhir" name="periodeAkhir" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <input type="date" id="periodeAwal" name="periodeAwal" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-slate-700 dark:text-slate-200">
+                                <span class="text-slate-500 dark:text-slate-400">s/d</span>
+                                <input type="date" id="periodeAkhir" name="periodeAkhir" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-slate-700 dark:text-slate-200">
+                            </div>
+                            <!-- Pesan error untuk validasi tanggal -->
+                            <div id="date-error" class="text-red-500 text-xs mt-2 hidden">
+                                Tanggal akhir tidak boleh lebih awal dari tanggal awal.
                             </div>
                         </div>
 
                         <!-- Input Jumlah Pemakaian -->
                         <div>
-                            <label for="jumlahPemakaian" class="block text-sm font-medium text-slate-700 mb-1">Jumlah Pemakaian Listrik (kWh)</label>
-                            <input type="number" id="jumlahPemakaian" name="jumlahPemakaian" min="1" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <label for="jumlahPemakaian" class="flex items-center text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                <i class="fa-solid fa-bolt-lightning w-4 mr-2 text-slate-400"></i> Jumlah Pemakaian Listrik (kWh)
+                            </label>
+                            <input type="number" id="jumlahPemakaian" name="jumlahPemakaian" placeholder="Contoh: 150" min="1" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white dark:bg-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500">
                         </div>
                     </div>
 
@@ -87,7 +140,7 @@
                         <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
                             Hitung Tagihan
                         </button>
-                        <button type="reset" id="resetButton" class="w-full bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-lg hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition duration-300">
+                        <button type="reset" id="resetButton" class="w-full bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-slate-100 font-bold py-3 px-4 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition duration-300">
                             Batal
                         </button>
                     </div>
@@ -95,52 +148,62 @@
             </div>
 
             <!-- Kolom Rincian Tagihan (Awalnya Tersembunyi) -->
-            <div id="rincianTagihan" class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hidden">
-                <h2 class="text-xl font-bold mb-4 pb-4 border-b border-slate-200">Rincian Tagihan</h2>
+            <div id="rincianTagihan" class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-lg hidden">
+                <h2 class="text-xl font-bold mb-4 pb-4 border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white">Rincian Tagihan</h2>
                 <div class="space-y-3 text-sm">
                     <!-- Detail Tagihan akan ditampilkan di sini -->
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Nama Pelanggan</span>
+                        <span class="text-slate-600 dark:text-slate-400">Nama Pelanggan</span>
                         <span id="namaPelangganCell" class="font-semibold text-right"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Kategori</span>
+                        <span class="text-slate-600 dark:text-slate-400">Kategori</span>
                         <span id="kategoriCell" class="font-semibold text-right"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Periode</span>
+                        <span class="text-slate-600 dark:text-slate-400">Periode</span>
                         <span id="periodeCell" class="font-semibold text-right"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Jumlah Pemakaian</span>
+                        <span class="text-slate-600 dark:text-slate-400">Jumlah Pemakaian</span>
                         <span id="jumlahPemakaianCell" class="font-semibold text-right"></span>
                     </div>
                     
-                    <hr class="my-4 border-dashed">
+                    <hr class="my-4 border-dashed border-slate-200 dark:border-slate-700">
 
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Tarif per kWh</span>
+                        <span class="text-slate-600 dark:text-slate-400">Tarif per kWh</span>
                         <span id="tarifPerKwhCell" class="font-semibold text-right"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Biaya Abodemen</span>
+                        <span class="text-slate-600 dark:text-slate-400">Biaya Abodemen</span>
                         <span id="abodemenCell" class="font-semibold text-right"></span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-slate-600">Pajak</span>
+                        <span class="text-slate-600 dark:text-slate-400">Pajak</span>
                         <span id="pajakCell" class="font-semibold text-right"></span>
                     </div>
                     
                     <!-- Total Tagihan -->
-                    <div class="mt-6 pt-4 border-t-2 border-slate-300">
+                    <div class="mt-6 pt-4 border-t-2 border-slate-300 dark:border-slate-600">
                         <div class="flex justify-between items-center">
                             <span class="text-base font-bold">Total Tagihan</span>
-                            <span id="subTotalCell" class="text-xl lg:text-2xl font-extrabold text-blue-600"></span>
+                            <span id="subTotalCell" class="text-xl lg:text-2xl font-extrabold text-blue-600 dark:text-blue-500"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 py-4">
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+                Dibuat oleh 
+                <a href="https://totiard.github.io/Profile-New/" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 dark:text-blue-500 hover:underline">
+                    Toti Ardiansyah
+                </a>
+            </p>
+        </footer>
     </div>
 
     <script src="script.js"></script>
